@@ -20,7 +20,7 @@ class openvpn::params {
       $group            = 'nobody'
       $link_openssl_cnf = true
       $pam_module_path  = '/usr/lib64/openvpn/plugin/lib/openvpn-auth-pam.so'
-      $additional_packages = ['easy-rsa']
+      $additional_packages = ['easy-rsa','openvpn-auth-ldap']
       $easyrsa_source      = '/usr/share/easy-rsa/2.0'
 
       # Redhat/Centos >= 7.0
@@ -30,8 +30,16 @@ class openvpn::params {
       } else {
         $systemd = false
       }
-
-      $ldap_auth_plugin_location = undef # no ldap plugin on redhat/centos
+      
+      #contains openvpn-auth-ldap lib
+      yumrepo { 'EPEL_repo':
+          baseurl  => "https://dl.fedoraproject.org/pub/epel/${::operatingsystemmajrelease}/${::architecture}",
+          descr    => 'Extra Packages for Enterprise Linux',
+          enabled  => 1,
+          gpgcheck => 0
+       }
+            
+      $ldap_auth_plugin_location = '/usr/lib64/openvpn/plugin/lib/openvpn-auth-pam.so'
     }
     'Debian': { # Debian/Ubuntu
       $group = 'nogroup'
